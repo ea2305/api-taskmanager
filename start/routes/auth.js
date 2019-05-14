@@ -10,5 +10,6 @@ const Route = use('Route')
 Route.group(() => {
   // Login intent
   Route.post('login', 'AuthController.login')
+    .middleware(['login_attemp'])
 })
   .prefix('api/v1/auth')

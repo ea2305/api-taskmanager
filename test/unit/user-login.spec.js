@@ -2,6 +2,8 @@
 
 const Factory = use('Factory')
 const { test, trait } = use('Test/Suite')('User Login')
+const LoginAttemp = use('App/Models/LoginAttemp')
+
 trait('Test/ApiClient')
 
 /**
@@ -9,7 +11,7 @@ trait('Test/ApiClient')
  * [ok] login request with bad email
  * [ok] login request with bad password
  * [ok] login successful request
- * login request with limit to request allowed
+ * [ok] login request with limit to request allowed
  */
 test('[Login] Request access with a wrong email', async ({ client }) => {
   // Create test user
@@ -36,7 +38,7 @@ test('[Login] Request access with a wrong password', async ({ client }) => {
   // Create test user
   const user = await Factory.model('App/Models/User').create()
 
-  // Send request to API with invalid email
+  // Send request to API with invalid password
   const response = await client.post('/api/v1/auth/login')
     .send({
       email: user.email,
@@ -57,7 +59,7 @@ test('[Login] Successful request login with email & password', async ({ client }
   // Create test user
   const user = await Factory.model('App/Models/User').create()
 
-  // Send request to API with invalid email
+  // Send request to API 
   const response = await client.post('/api/v1/auth/login')
     .send({
       email: user.email,
@@ -70,6 +72,36 @@ test('[Login] Successful request login with email & password', async ({ client }
   // check response content
   response.assertJSONSubset({ type: 'bearer' })
 
+  // delete test user
+  await user.delete()
+})
+
+test('[Login] Request limit', async ({ client }) => {
+  // Create test user
+  const user = await Factory.model('App/Models/User').create()
+
+  // Send request to API 5 times
+  for (let i = 0; i < 5; i++) {
+    await client.post('/api/v1/auth/login')
+      .send({ email: user.email, password: 'fake_password_bad'}).end()
+  }
+
+  // send one more time to get the message of error
+  const response = await client.post('/api/v1/auth/login')
+    .send({
+      email: user.email,
+      password: 'fake_password'
+    })
+    .end()
+
+  // Check response status
+  response.assertStatus(429)
+  
+  // check response content
+  response.assertJSONSubset({ message: 'Too many request' })
+
+  const attemps = await LoginAttemp.query().where('attemps', '>', 4).first()
+  await attemps.delete()
   // delete test user
   await user.delete()
 })
