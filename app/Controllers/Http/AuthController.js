@@ -1,12 +1,15 @@
 'use strict'
 
+const Env = use('Env')
+const Logger = use('Logger')
+
 class AuthController {
   /**
    * Login user controller
    * @param {Object} request : HTTP Request
    * @param {Object} response : HTTP Request
    */
-  async login ({ request, response }) {
+  async login ({ request, response, auth }) {
     // get user request information
     const filter = ['email', 'password']
     const { email, password } = request.only(filter)
@@ -17,7 +20,10 @@ class AuthController {
       // return token to client
       return response.ok({ token: token.token, type: token.type })
     } catch (error) {
-      return response.unauthorized({ error: 'bad credentials' })
+      if (Env.get('Logger') == 'true')
+        Logger.error(error)
+      
+        return response.unauthorized({ error: 'bad credentials' })
     }
   }
 }
