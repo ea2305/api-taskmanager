@@ -27,7 +27,9 @@
     "@adonisjs/vow": "1.0.17",
     "sqlite3": "4.0.8"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "5.16.0"
+  },
   "autoload": {
     "App": "./app"
   }
