@@ -3,8 +3,12 @@
 // Models
 const User = use('App/Models/User')
 
-const Env = use('Env')
+// Tools
 const Logger = use('Logger')
+const Env = use('Env')
+
+// Libs
+const randtoken = require('rand-token')
 
 class AuthController {
   /**
@@ -38,7 +42,21 @@ class AuthController {
     const { email } = request.only(['email'])
 
     try {
+      // Find user
       const user = await User.findByOrFail('email', email)
+      // Generate random token
+      const token = randtoken.generate(16)
+      // Create restore token
+      // const token = await Token.create({ token, type: 'restore-password' })
+      // Send email
+      Event.fire('auth::restore_request', { 
+        username: user.username,
+        email: user.email,
+        page: Env.get('MAIL_BASE_URL'),
+        token
+      })
+      
+      
       return response.ok(user)
     } catch (error) {
       if (Env.get('DEBUG') == 'true')
