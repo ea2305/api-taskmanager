@@ -29,6 +29,9 @@ Configure your database and then execute migrations
 adonis migration:run
 ```
 
+If you want to use Eslint with this project you can use it.
+
+
 ## Testing
 **Migrations first**
 Execute unit test running the following command with adonis
