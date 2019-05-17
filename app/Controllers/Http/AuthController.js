@@ -5,6 +5,7 @@ const User = use('App/Models/User')
 
 // Tools
 const Logger = use('Logger')
+const Event = use('Event')
 const Env = use('Env')
 
 // Libs
@@ -55,9 +56,7 @@ class AuthController {
         page: Env.get('MAIL_BASE_URL'),
         token
       })
-      
-      
-      return response.ok(user)
+      return response.ok({ message: 'The request was sent' })
     } catch (error) {
       if (Env.get('DEBUG') == 'true')
         Logger.error(error)

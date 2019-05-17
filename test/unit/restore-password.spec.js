@@ -54,15 +54,6 @@ test('[Restore password] Success, email registered ', async ({ assert, client })
   // End connection
   Event.restore()
 
-  // Email validation
-  Mail.fake()
-
-  const recentEmail = Mail.pullRecent()
-  Logger.info(recentEmail)
-  assert.equal(recentEmail.message.to[0].address, user.email)
-
-  Mail.restore()
-
   // Check response status
   response.assertStatus(200)
   
