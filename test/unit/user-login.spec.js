@@ -3,6 +3,7 @@
 const Factory = use('Factory')
 const { test, trait } = use('Test/Suite')('User Login')
 const LoginAttemp = use('App/Models/LoginAttemp')
+const moment = require('moment')
 
 trait('Test/ApiClient')
 
@@ -12,6 +13,7 @@ trait('Test/ApiClient')
  * [ok] login request with bad password
  * [ok] login successful request
  * [ok] login request with limit to request allowed
+ * [] wait for unlock cool down after ban of too many request
  */
 test('[Login] Request access with a wrong email', async ({ client }) => {
   // Create test user
@@ -106,3 +108,35 @@ test('[Login] Request limit', async ({ client }) => {
   await user.delete()
 })
 
+test('[Login] Attemp after cooldown request limit', async ({ client }) => {
+  // Create test user
+  const user = await Factory.model('App/Models/User').create()
+
+  // Send request to API 5 times
+  for (let i = 0; i < 5; i++) {
+    await client.post('/api/v1/auth/login')
+      .send({ email: user.email, password: 'fake_password_bad'}).end()
+  }
+
+  const attemps = await LoginAttemp.query().where('attemps', '>', 3).first()
+  attemps.last_login = moment.utc().subtract(1, 'day')
+  await attemps
+
+  // send one more time to get the message of error
+  const response = await client.post('/api/v1/auth/login')
+    .send({
+      email: user.email,
+      password: 'fake_password'
+    })
+    .end()
+
+  // Check response status
+  response.assertStatus(429)
+  
+  // check response content
+  response.assertJSONSubset({ message: 'Too many request' })
+
+  await attemps.delete()
+  // delete test user
+  await user.delete()
+})
