@@ -3,17 +3,14 @@
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
-const EntityLoginAttemp = use('App/Models/LoginAttemp')
+const EntityRequestAttemp = use('App/Models/RequestAttemp')
 const moment = require('moment')
-
-const Env = use('Env')
-const Logger = use('Logger')
 
 // Const validation
 const _allowed_attemps = 5
 const _cooldown_time = 10
 
-class LoginAttemp {
+class RequestAttemp {
   /**
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -21,20 +18,20 @@ class LoginAttemp {
    */
   async handle ({ response, clientIp }, next) {
     // find last login attemp
-    const loginAttemp = await EntityLoginAttemp.findBy('ip', clientIp)
+    const requestAttemp = await EntityRequestAttemp.findBy('ip', clientIp)
 
-    if (loginAttemp) {
+    if (requestAttemp) {
       // how many tries
-      const attemps = loginAttemp.attemps
+      const attemps = requestAttemp.attemps
       if (attemps >= _allowed_attemps) {
         // wait for time
         let now = moment()
-        let last_login = moment(loginAttemp.last_login)
+        let last_try = moment(requestAttemp.last_try)
         // validation
-        if (now.diff(last_login, 'minutes') >= _cooldown_time) {
+        if (now.diff(last_try, 'minutes') >= _cooldown_time) {
           // update attemps
-          loginAttemp.attemps = 1
-          await loginAttemp.save()
+          requestAttemp.attemps = 1
+          await requestAttemp.save()
           // allow flow
           await next()
         } else {
@@ -42,15 +39,15 @@ class LoginAttemp {
           return response.tooManyRequests({ message: 'Too many request' })
         }
       } else {
-        loginAttemp.attemps += 1
-        loginAttemp.last_login = moment()
-        await loginAttemp.save()
+        requestAttemp.attemps += 1
+        requestAttemp.last_try = moment()
+        await requestAttemp.save()
         // call next to advance the request
         await next()
       }
     } else {
-      await EntityLoginAttemp.create({
-        last_login: moment(),
+      await EntityRequestAttemp.create({
+        last_try: moment(),
         ip: clientIp,
         attemps: 1
       })
@@ -60,4 +57,4 @@ class LoginAttemp {
   }
 }
 
-module.exports = LoginAttemp
+module.exports = RequestAttemp

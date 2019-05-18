@@ -1,8 +1,7 @@
 'use strict'
 
 const Event = use('Event')
-const Mail = use('Mail')
-const Logger = use('Logger')
+
 const Factory = use('Factory')
 const { test, trait } = use('Test/Suite')('Restore Password')
 

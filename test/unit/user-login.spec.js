@@ -2,7 +2,7 @@
 
 const Factory = use('Factory')
 const { test, trait } = use('Test/Suite')('User Login')
-const LoginAttemp = use('App/Models/LoginAttemp')
+const RequestAttemp = use('App/Models/RequestAttemp')
 const moment = require('moment')
 
 trait('Test/ApiClient')
@@ -102,7 +102,7 @@ test('[Login] Request limit', async ({ client }) => {
   // check response content
   response.assertJSONSubset({ message: 'Too many request' })
 
-  const attemps = await LoginAttemp.query().where('attemps', '>', 4).first()
+  const attemps = await RequestAttemp.query().where('attemps', '>', 4).first()
   await attemps.delete()
   // delete test user
   await user.delete()
@@ -118,8 +118,8 @@ test('[Login] Attemp after cooldown request limit', async ({ client }) => {
       .send({ email: user.email, password: 'fake_password_bad'}).end()
   }
 
-  const attemps = await LoginAttemp.query().where('attemps', '>', 3).first()
-  attemps.last_login = moment.utc().subtract(1, 'day')
+  const attemps = await RequestAttemp.query().where('attemps', '>', 3).first()
+  attemps.last_try = moment.utc().subtract(1, 'day')
   await attemps
 
   // send one more time to get the message of error

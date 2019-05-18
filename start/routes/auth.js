@@ -10,7 +10,7 @@ const Route = use('Route')
 Route.group(() => {
   // Login intent
   Route.post('login', 'AuthController.login')
-    .middleware(['login_attemp'])
+    .middleware(['request_attemp'])
 
   Route.post('password/restore', 'AuthController.restoreRequest')
 })
