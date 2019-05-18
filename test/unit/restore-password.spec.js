@@ -79,16 +79,18 @@ test('[Restore password] Request limit', async ({ client }) => {
   const response = await client.post('/api/v1/auth/password/restore')
     .send({ email: user.email }).end()
 
-  // Check response status
-  response.assertStatus(429)
-  
-  // check response content
-  response.assertJSONSubset({ message: 'Too many request' })
-
-  const attemps = await RequestAttemp.query().where('attemps', '>', 4).first()
-  await attemps.delete()
-  // delete test user
-  await user.delete()
+  try {
+    // Check response status
+    response.assertStatus(429)
+    
+    // check response content
+    response.assertJSONSubset({ message: 'Too many request' })
+  } finally {
+    const attemps = await RequestAttemp.last()
+    await attemps.delete()
+    // delete test user
+    await user.delete()
+  }
 })
 
 test('[Restore password] Attemp after cooldown request limit', async ({ client }) => {
@@ -101,20 +103,22 @@ test('[Restore password] Attemp after cooldown request limit', async ({ client }
       .send({ email: 'wrong_email@mail.com' }).end()
   }
 
-  const attemps = await RequestAttemp.query().where('attemps', '>', 3).first()
-  attemps.last_try = moment.utc().subtract(1, 'day')
+  const attemps = await RequestAttemp.last()
+  attemps.last_try = moment.utc().subtract(1, 'day').toISOString()
 
   // send one more time to get the message of error
   const response = await client.post('/api/v1/auth/password/restore')
     .send({ email: user.email }).end()
 
-  // Check response status
-  response.assertStatus(429)
-  
-  // check response content
-  response.assertJSONSubset({ message: 'Too many request' })
-
-  await attemps.delete()
-  // delete test user
-  await user.delete()
+  try {
+    // Check response status
+    response.assertStatus(429)
+    
+    // check response content
+    response.assertJSONSubset({ message: 'Too many request' })
+  } finally {
+    await attemps.delete()
+    // delete test user
+    await user.delete()
+  }
 })

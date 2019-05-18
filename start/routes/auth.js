@@ -13,5 +13,6 @@ Route.group(() => {
     .middleware(['request_attemp'])
 
   Route.post('password/restore', 'AuthController.restoreRequest')
+    .middleware(['request_attemp'])
 })
   .prefix('api/v1/auth')
