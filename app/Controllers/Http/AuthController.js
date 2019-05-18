@@ -30,7 +30,7 @@ class AuthController {
     } catch (error) {
       if (Env.get('Logger') == 'true')
         Logger.error(error)
-        return response.unauthorized({ error: 'bad credentials' })
+        return response.unauthorized({ error: 'wrong credentials' })
     }
   }
 

@@ -9,8 +9,8 @@ trait('Test/ApiClient')
 
 /**
  * In this test we will cover the following aspects
- * [ok] login request with bad email
- * [ok] login request with bad password
+ * [ok] login request with wrong email
+ * [ok] login request with wrong password
  * [ok] login successful request
  * [ok] login request with limit to request allowed
  * [] wait for unlock cool down after ban of too many request
@@ -22,7 +22,7 @@ test('[Login] Request access with a wrong email', async ({ client }) => {
   // Send request to API with invalid email
   const response = await client.post('/api/v1/auth/login')
     .send({
-      email: 'bad_email@example.com',
+      email: 'wrong_email@example.com',
       password: 'fake_password'
     })
     .end()
@@ -30,7 +30,7 @@ test('[Login] Request access with a wrong email', async ({ client }) => {
   response.assertStatus(401)
   
   // check response content
-  response.assertJSONSubset({ error: 'bad credentials' })
+  response.assertJSONSubset({ error: 'wrong credentials' })
 
   // delete test user
   await user.delete()
@@ -44,14 +44,14 @@ test('[Login] Request access with a wrong password', async ({ client }) => {
   const response = await client.post('/api/v1/auth/login')
     .send({
       email: user.email,
-      password: 'bad_password___'
+      password: 'wrong_password___'
     })
     .end()
   // Check response status
   response.assertStatus(401)
   
   // check response content
-  response.assertJSONSubset({ error: 'bad credentials' })
+  response.assertJSONSubset({ error: 'wrong credentials' })
 
   // delete test user
   await user.delete()
@@ -85,7 +85,7 @@ test('[Login] Request limit', async ({ client }) => {
   // Send request to API 5 times
   for (let i = 0; i < 5; i++) {
     await client.post('/api/v1/auth/login')
-      .send({ email: user.email, password: 'fake_password_bad'}).end()
+      .send({ email: user.email, password: 'wrong_fake_password'}).end()
   }
 
   // send one more time to get the message of error
@@ -115,7 +115,7 @@ test('[Login] Attemp after cooldown request limit', async ({ client }) => {
   // Send request to API 5 times
   for (let i = 0; i < 5; i++) {
     await client.post('/api/v1/auth/login')
-      .send({ email: user.email, password: 'fake_password_bad'}).end()
+      .send({ email: user.email, password: 'wrong_fake_password'}).end()
   }
 
   const attemps = await RequestAttemp.query().where('attemps', '>', 3).first()
