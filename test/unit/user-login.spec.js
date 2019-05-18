@@ -96,16 +96,18 @@ test('[Login] Request limit', async ({ client }) => {
     })
     .end()
 
-  // Check response status
-  response.assertStatus(429)
-  
-  // check response content
-  response.assertJSONSubset({ message: 'Too many request' })
-
-  const attemps = await RequestAttemp.query().where('attemps', '>', 4).first()
-  await attemps.delete()
-  // delete test user
-  await user.delete()
+  try {
+    // Check response status
+    response.assertStatus(429)
+    
+    // check response content
+    response.assertJSONSubset({ message: 'Too many request' })
+  } finally {
+    const attemps = await RequestAttemp.last()
+    await attemps.delete()
+    // delete test user
+    await user.delete()
+  }
 })
 
 test('[Login] Attemp after cooldown request limit', async ({ client }) => {
@@ -118,7 +120,7 @@ test('[Login] Attemp after cooldown request limit', async ({ client }) => {
       .send({ email: user.email, password: 'wrong_fake_password'}).end()
   }
 
-  const attemps = await RequestAttemp.query().where('attemps', '>', 3).first()
+  const attemps = await RequestAttemp.last()
   attemps.last_try = moment.utc().subtract(1, 'day')
   await attemps
 
@@ -130,13 +132,16 @@ test('[Login] Attemp after cooldown request limit', async ({ client }) => {
     })
     .end()
 
-  // Check response status
-  response.assertStatus(429)
-  
-  // check response content
-  response.assertJSONSubset({ message: 'Too many request' })
+  try {
+    // Check response status
+    response.assertStatus(200)
+    
+    // check response content
+    response.assertJSONSubset({ type: 'bearer' })
+  } finally {
+    await attemps.delete()
+    // delete test user
+    await user.delete()
+  }
 
-  await attemps.delete()
-  // delete test user
-  await user.delete()
 })

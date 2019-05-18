@@ -5,6 +5,7 @@ const Event = use('Event')
 const Factory = use('Factory')
 const { test, trait } = use('Test/Suite')('Restore Password')
 const RequestAttemp = use('App/Models/RequestAttemp')
+const moment = require('moment')
 
 trait('Test/ApiClient')
 
@@ -71,16 +72,12 @@ test('[Restore password] Request limit', async ({ client }) => {
   // Send request to API 5 times
   for (let i = 0; i < 5; i++) {
     await client.post('/api/v1/auth/password/restore')
-      .send({ email: 'wrong_email' }).end()
+      .send({ email: 'wrong_email@mail.com' }).end()
   }
 
   // send one more time to get the message of error
-  const response = await client.post('/api/v1/auth/login')
-    .send({
-      email: user.email,
-      password: 'fake_password'
-    })
-    .end()
+  const response = await client.post('/api/v1/auth/password/restore')
+    .send({ email: user.email }).end()
 
   // Check response status
   response.assertStatus(429)
@@ -94,27 +91,22 @@ test('[Restore password] Request limit', async ({ client }) => {
   await user.delete()
 })
 
-test('[Login] Attemp after cooldown request limit', async ({ client }) => {
+test('[Restore password] Attemp after cooldown request limit', async ({ client }) => {
   // Create test user
   const user = await Factory.model('App/Models/User').create()
 
   // Send request to API 5 times
   for (let i = 0; i < 5; i++) {
-    await client.post('/api/v1/auth/login')
-      .send({ email: user.email, password: 'fake_password_bad'}).end()
+    await client.post('/api/v1/auth/password/restore')
+      .send({ email: 'wrong_email@mail.com' }).end()
   }
 
   const attemps = await RequestAttemp.query().where('attemps', '>', 3).first()
   attemps.last_try = moment.utc().subtract(1, 'day')
-  await attemps
 
   // send one more time to get the message of error
-  const response = await client.post('/api/v1/auth/login')
-    .send({
-      email: user.email,
-      password: 'fake_password'
-    })
-    .end()
+  const response = await client.post('/api/v1/auth/password/restore')
+    .send({ email: user.email }).end()
 
   // Check response status
   response.assertStatus(429)
