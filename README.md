@@ -31,6 +31,24 @@ adonis migration:run
 
 If you want to use Eslint with this project you can use it.
 
+### Email configuration
+
+The system implements the Adonis Mail system based in node mail code.
+All the configuration can be done trough .env files
+
+> Production and testing hava their configuration files. Keep in mind before proceed.
+
+```yml
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_SECURE=true
+MAIL_USERNAME=example@example.com
+MAIL_PASSWORD=password_example
+
+MAIL_BASE_URL=${APP_URL}/restore-password
+MAIL_APP_EMAIL=${MAIL_USERNAME}
+MAIL_APP_NAME=TaskManager
+```
 
 ## Testing
 **Migrations first**
