@@ -27,7 +27,6 @@ class RequestAttemp {
         // wait for time
         let now = moment()
         let last_try = moment(requestAttemp.last_try)
-        console.log(now, last_try, requestAttemp.last_try)
         // validation
         if (now.diff(last_try, 'minutes') >= _cooldown_time) {
           // update attemps
@@ -41,7 +40,7 @@ class RequestAttemp {
         }
       } else {
         requestAttemp.attemps += 1
-        requestAttemp.last_try = moment()
+        requestAttemp.last_try = moment().toISOString()
         await requestAttemp.save()
         // call next to advance the request
         await next()

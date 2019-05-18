@@ -121,8 +121,8 @@ test('[Login] Attemp after cooldown request limit', async ({ client }) => {
   }
 
   const attemps = await RequestAttemp.last()
-  attemps.last_try = moment.utc().subtract(1, 'day')
-  await attemps
+  attemps.last_try = moment.utc().subtract(1, 'day').toISOString()
+  await attemps.save()
 
   // send one more time to get the message of error
   const response = await client.post('/api/v1/auth/login')
