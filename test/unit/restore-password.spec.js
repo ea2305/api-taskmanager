@@ -24,6 +24,7 @@ test('[Restore password] Wrong email request ', async ({ client }) => {
 
   // send one more time to get the message of error
   const response = await client.post('/api/v1/auth/password/restore')
+    .header('accept', 'application/json')  
     .send({ email: 'wrong_email@yopmail.com' })
     .end()
 
@@ -45,6 +46,7 @@ test('[Restore password] Success, email registered ', async ({ assert, client })
 
   // send one more time to get the message of error
   const response = await client.post('/api/v1/auth/password/restore')
+    .header('accept', 'application/json')  
     .send({ email: user.email })
     .end()
 
@@ -119,7 +121,9 @@ test('[Restore password] Request limit', async ({ client }) => {
 
   // send one more time to get the message of error
   const response = await client.post('/api/v1/auth/password/restore')
-    .send({ email: user.email }).end()
+    .header('accept', 'application/json')    
+    .send({ email: user.email })
+    .end()
 
   try {
     // Check response status
@@ -149,8 +153,10 @@ test('[Restore password] Attemp after cooldown request limit', async ({ client }
   attemps.last_try = moment.utc().subtract(1, 'day').toISOString()
 
   // send one more time to get the message of error
-  const response = await client.post('/api/v1/auth/password/restore')
-    .send({ email: user.email }).end()
+  const response = await client.post('/api/v1/auth/password/restore')  
+    .header('accept', 'application/json')  
+    .send({ email: user.email })
+    .end()
 
   try {
     // Check response status

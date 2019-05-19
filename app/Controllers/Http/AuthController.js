@@ -63,6 +63,15 @@ class AuthController {
       return response.notFound({ error: 'The email is not registered' })
     }
   }
+
+  /**
+   * Get user information througth token
+   * @param {Object} ctx.auth Auth service instance
+   * @param {Object} ctx.response
+   */
+  async profile ({ auth, response }) {
+    return response.ok({ user: auth.user, auth: true })
+  }
 }
 
 module.exports = AuthController

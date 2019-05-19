@@ -16,5 +16,8 @@ Route.group(() => {
   Route.post('password/restore', 'AuthController.restoreRequest')
     .middleware(['request_attemp'])
     .validator('RestoreAccount')
+
+  Route.get('profile', 'AuthController.profile')
+    .middleware(['auth'])
 })
   .prefix('api/v1/auth')

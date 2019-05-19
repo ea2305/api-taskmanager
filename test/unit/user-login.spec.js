@@ -2,6 +2,7 @@
 
 const Factory = use('Factory')
 const { test, trait } = use('Test/Suite')('User Login')
+
 const RequestAttemp = use('App/Models/RequestAttemp')
 const moment = require('moment')
 
@@ -26,19 +27,23 @@ test('[Login] access with a wrong email', async ({ client }) => {
 
   // Send request to API with invalid email
   const response = await client.post('/api/v1/auth/login')
-    .send({
+  .header('accept', 'application/json')    
+  .send({
       email: 'wrong_email@example.com',
       password: 'fake_password'
     })
     .end()
-  // Check response status
-  response.assertStatus(401)
-  
-  // check response content
-  response.assertJSONSubset({ error: 'wrong credentials' })
+  try {
+    // Check response status
+    response.assertStatus(401)
+    
+    // check response content
+    response.assertJSONSubset({ error: 'wrong credentials' })
 
-  // delete test user
-  await user.delete()
+  } finally {
+    // delete test user
+    await user.delete()
+  }
 })
 
 test('[Login] require email field', async ({ client }) => {
@@ -95,6 +100,7 @@ test('[Login] access with a wrong password', async ({ client }) => {
 
   // Send request to API with invalid password
   const response = await client.post('/api/v1/auth/login')
+    .header('accept', 'application/json')    
     .send({
       email: user.email,
       password: 'wrong_password___'
@@ -185,6 +191,7 @@ test('[Login] Successful request login with email & password', async ({ client }
 
   // Send request to API 
   const response = await client.post('/api/v1/auth/login')
+    .header('accept', 'application/json')    
     .send({
       email: user.email,
       password: 'fake_password'
@@ -212,6 +219,7 @@ test('[Login] Request limit', async ({ client }) => {
 
   // send one more time to get the message of error
   const response = await client.post('/api/v1/auth/login')
+    .header('accept', 'application/json')    
     .send({
       email: user.email,
       password: 'fake_password'
@@ -248,6 +256,7 @@ test('[Login] Attemp after cooldown request limit', async ({ client }) => {
 
   // send one more time to get the message of error
   const response = await client.post('/api/v1/auth/login')
+    .header('accept', 'application/json')    
     .send({
       email: user.email,
       password: 'fake_password'
