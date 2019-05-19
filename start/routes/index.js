@@ -17,6 +17,7 @@
 const Route = use('Route')
 
 require('./auth')
+require('./workspace')
 
 Route.get('/', () => {
   return { about: 'Pulse server <3' }

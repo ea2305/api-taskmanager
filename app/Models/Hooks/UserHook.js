@@ -7,7 +7,6 @@ const uuid = require('uuid')
 const UserHook = exports = module.exports = {}
 
 UserHook.uuid = async (user) => {
-  // when incrementing is false
   user.primaryKeyValue = uuid.v4()
 }
 
