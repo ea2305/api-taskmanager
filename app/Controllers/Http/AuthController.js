@@ -14,6 +14,7 @@ const randtoken = require('rand-token')
 class AuthController {
   /**
    * Login user controller
+   * @param {object} ctx
    * @param {Object} ctx.request : HTTP Request
    * @param {Object} ctx.response : HTTP Request
    */
@@ -36,6 +37,7 @@ class AuthController {
 
   /**
    * Restore password intent
+   * @param {object} ctx
    * @param {Object} ctx.request  
    * @param {Object} ctx.response  
    */
@@ -66,6 +68,7 @@ class AuthController {
 
   /**
    * Get user information througth token
+   * @param {object} ctx
    * @param {Object} ctx.auth Auth service instance
    * @param {Object} ctx.response
    */

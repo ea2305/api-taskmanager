@@ -4,6 +4,8 @@
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
+const Workspace = use('App/Models/Workspace')
+
 /**
  * Resourceful controller for interacting with workspaces
  */
@@ -17,19 +19,7 @@ class WorkspaceController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index ({ request, response, view }) {
-  }
-
-  /**
-   * Render a form to be used for creating a new workspace.
-   * GET workspaces/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
+  async index ({ request, response }) {
   }
 
   /**
@@ -41,6 +31,13 @@ class WorkspaceController {
    * @param {Response} ctx.response
    */
   async store ({ request, response }) {
+    // required parameters
+    const parameters = ['name', 'description']
+    const workspaceData = request.only(parameters)
+
+    // Store entity
+    const workspace = await Workspace.create(workspaceData)
+    return response.created(workspace)
   }
 
   /**
@@ -52,19 +49,7 @@ class WorkspaceController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
-  }
-
-  /**
-   * Render a form to update an existing workspace.
-   * GET workspaces/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
+  async show ({ params, request, response }) {
   }
 
   /**
