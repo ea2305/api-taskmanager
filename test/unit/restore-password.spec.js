@@ -13,8 +13,10 @@ trait('Test/ApiClient')
  * in this file we will cover all the following requirements
  * [x] request restore password with unregistered account
  * [x] request restore password with registered account
+ * [] request password email required
+ * [] request password with invalid email
  * [x] reject request after 3 attemps with wrong email
- * [] wait for unlock cool down after ban of too many request
+ * [x] wait for unlock cool down after ban of too many request
  */
 test('[Restore password] Wrong email request ', async ({ client }) => {
   // Create test user
@@ -22,7 +24,7 @@ test('[Restore password] Wrong email request ', async ({ client }) => {
 
   // send one more time to get the message of error
   const response = await client.post('/api/v1/auth/password/restore')
-    .send({ email: 'wrong_email' })
+    .send({ email: 'wrong_email@yopmail.com' })
     .end()
 
   // Check response status
@@ -63,6 +65,26 @@ test('[Restore password] Success, email registered ', async ({ assert, client })
 
   // delete test user
   await user.delete()
+})
+
+test('[Restore password] Email is required', async ({ client }) => {
+
+  // send request without email
+  const response = await client.post('/api/v1/auth/password/restore')
+    .header('accept', 'application/json')  
+    .send()
+    .end()
+
+  try {
+    // Check response status
+    response.assertStatus(400)
+    
+    // check response content
+    response.assertJSONSubset([{ field: 'email', validation: 'required' }])
+  } finally {
+    const attemps = await RequestAttemp.last()
+    await attemps.delete()
+  }
 })
 
 test('[Restore password] Request limit', async ({ client }) => {

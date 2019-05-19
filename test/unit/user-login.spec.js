@@ -44,7 +44,7 @@ test('[Login] access with a wrong email', async ({ client }) => {
 test('[Login] require email field', async ({ client }) => {
   // Send request to API with invalid email
   const response = await client.post('/api/v1/auth/login')
-    .header('accept', 'application/json')  
+    .header('accept', 'application/json')
     .send({ password: 'fake_password' })
     .end()
   // Check response status

@@ -16,10 +16,10 @@ class Login {
 
   get messages () {
     return {
-      'email': 'Invalid email format',
-      'required': '{{ field }} field is required',
-      'min': 'The field has not the minimum {{ argument.0 }} characters',
-      'max': 'The field has more than {{ argument.0 }} characters'
+      email: 'Invalid email format',
+      required: '{{ field }} field is required',
+      min: 'The field has not the minimum {{ argument.0 }} characters',
+      max: 'The field has more than {{ argument.0 }} characters'
     }
   }
 }
