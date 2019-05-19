@@ -28,7 +28,8 @@
     "@adonisjs/validator": "5.0.6",
     "@adonisjs/vow": "1.0.17",
     "rand-token": "0.4.0",
-    "sqlite3": "4.0.8"
+    "sqlite3": "4.0.8",
+    "uuid": "3.3.2"
   },
   "devDependencies": {
     "eslint": "5.16.0"
