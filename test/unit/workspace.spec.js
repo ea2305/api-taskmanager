@@ -41,3 +41,53 @@ test('[Workspace] Create, name id required', async ({ client }) => {
     await user.delete()
   }
 })
+
+test('[Workspace] Create, name min characters', async ({ client }) => {
+  // Create test user
+  const user = await Factory.model('App/Models/User').create()
+
+  try {
+    // send one more time to get the message of error
+    const response = await client.post('/api/v1/workspace')
+      .header('accept', 'application/json')
+      .send({
+        name: 'a',
+        description: 'Without description'
+      })
+      .loginVia(user, 'jwt')
+      .end()
+
+    // Check response status
+    response.assertStatus(400)
+    
+    // check response content
+    response.assertJSONSubset([{ field: 'name', validation: 'min' }])
+  } finally {
+    await user.delete()
+  }
+})
+
+test('[Workspace] Create, name max characters', async ({ client }) => {
+  // Create test user
+  const user = await Factory.model('App/Models/User').create()
+
+  try {
+    // send one more time to get the message of error
+    const response = await client.post('/api/v1/workspace')
+      .header('accept', 'application/json')
+      .send({
+        name: '256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256256asdfasdfasdfas',
+        description: 'Without description'
+      })
+      .loginVia(user, 'jwt')
+      .end()
+
+    // Check response status
+    response.assertStatus(400)
+    
+    // check response content
+    response.assertJSONSubset([{ field: 'name', validation: 'max' }])
+  } finally {
+    await user.delete()
+  }
+})
