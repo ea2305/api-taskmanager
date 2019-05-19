@@ -87,6 +87,26 @@ test('[Restore password] Email is required', async ({ client }) => {
   }
 })
 
+test('[Restore password] Email format', async ({ client }) => {
+
+  // send request without email
+  const response = await client.post('/api/v1/auth/password/restore')
+    .header('accept', 'application/json')  
+    .send({ email: 'asdfasdfasdf' })
+    .end()
+
+  try {
+    // Check response status
+    response.assertStatus(400)
+    
+    // check response content
+    response.assertJSONSubset([{ field: 'email', validation: 'email' }])
+  } finally {
+    const attemps = await RequestAttemp.last()
+    await attemps.delete()
+  }
+})
+
 test('[Restore password] Request limit', async ({ client }) => {
   // Create test user
   const user = await Factory.model('App/Models/User').create()
