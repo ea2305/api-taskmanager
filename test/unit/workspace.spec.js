@@ -216,3 +216,65 @@ test('[Workspace] Create with relationship owner', async ({ client }) => {
     await user.delete()
   }
 })
+
+test('[Workspace] Update values', async ({ client }) => {
+  // Create test user
+  const user = await Factory.model('App/Models/User').create()
+  const workspace = await Factory.model('App/Models/Workspace').create()
+  // link user relationship
+  await workspace.owner().associate(user)
+
+  try {
+    // send one more time to get the message of error
+    const response = await client.put(`/api/v1/workspace/${workspace.uid}`)
+      .header('accept', 'application/json')
+      .send({
+        name: 'update name',
+        description: 'update description'
+      })
+      .loginVia(user, 'jwt')
+      .end()
+
+    // Check response status
+    response.assertStatus(201)
+    
+    // check response content
+    response.assertJSONSubset({
+      name: 'update name',
+      description: 'update description'
+    })
+  } finally {
+    await user.delete()
+    await workspace.delete()
+  }
+})
+
+test('[Workspace] Only owner can update ws values', async ({ client }) => {
+  // Create test user
+  const user = await Factory.model('App/Models/User').create()
+  const fake = await Factory.model('App/Models/User').create()
+  const workspace = await Factory.model('App/Models/Workspace').create()
+  // link user relationship
+  await workspace.owner().associate(user)
+
+  try {
+    // send one more time to get the message of error
+    const response = await client.put(`/api/v1/workspace/${workspace.uid}`)
+      .header('accept', 'application/json')
+      .send({
+        name: 'update name',
+        description: 'update description'
+      })
+      .loginVia(fake, 'jwt')
+      .end()
+
+    // Check response status
+    response.assertStatus(401)
+    
+    // check response content
+    response.assertJSONSubset({ error: 'You are not the owner of this workspace'})
+  } finally {
+    await user.delete()
+    await workspace.delete()
+  }
+})

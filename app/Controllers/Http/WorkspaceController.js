@@ -65,7 +65,16 @@ class WorkspaceController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update ({ workspace, request, response }) {
+    // required parameters
+    const parameters = ['name', 'description']
+    const workspaceData = request.only(parameters)
+
+    // update entity
+    workspace.merge(workspaceData)
+    await workspace.save()
+
+    return response.created(workspace)
   }
 
   /**

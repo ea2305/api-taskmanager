@@ -21,3 +21,10 @@ Factory.blueprint('App/Models/User', (faker) => {
     password: 'fake_password'
   }
 })
+
+Factory.blueprint('App/Models/Workspace', (faker) => {
+  return {
+    name: faker.word(),
+    description: faker.paragraph()
+  }
+})

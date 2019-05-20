@@ -12,5 +12,10 @@ Route.group(() => {
   Route.post('/', 'WorkspaceController.store')
     .middleware(['auth'])
     .validator('Workspace')
+
+  // Update current resource
+  Route.put('/:workspace_uid', 'WorkspaceController.update')
+    .middleware(['auth', 'workspace', 'workspace_owner'])
+    .validator('Workspace')
 })
   .prefix('api/v1/workspace')

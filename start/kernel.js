@@ -38,7 +38,9 @@ const globalMiddleware = [
 const namedMiddleware = {
   auth: 'Adonis/Middleware/Auth',
   guest: 'Adonis/Middleware/AllowGuestOnly',
-  request_attemp: 'App/Middleware/RequestAttemp'
+  request_attemp: 'App/Middleware/RequestAttemp',
+  workspace: 'App/Middleware/WorkspaceEntity',
+  workspace_owner: 'App/Middleware/WorkspaceOwner'
 }
 
 /*
