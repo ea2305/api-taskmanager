@@ -13,9 +13,10 @@ trait('Auth/Client')
  * [x] Create one workspace (name min text)
  * [x] Create one workspace (name max text)
  * [x] Create one workspace (description is required)
- * [] Create one workspace (description min text)
- * [] Create one workspace (description max text)
- * [] Create one workspace success
+ * [x] Create one workspace (description min text)
+ * [x] Create one workspace (description max text)
+ * [x] Create one workspace success
+ * [x] Create one workspace with relationship
  */
 
 test('[Workspace] Create, name id required', async ({ client }) => {
@@ -166,7 +167,7 @@ test('[Workspace] Create, description max chars', async ({ client }) => {
   }
 })
 
-test('[Workspace] Create, description max chars', async ({ client }) => {
+test('[Workspace] Create success', async ({ client }) => {
   // Create test user
   const user = await Factory.model('App/Models/User').create()
 
@@ -191,4 +192,27 @@ test('[Workspace] Create, description max chars', async ({ client }) => {
   }
 })
 
+test('[Workspace] Create with relationship owner', async ({ client }) => {
+  // Create test user
+  const user = await Factory.model('App/Models/User').create()
 
+  try {
+    // send one more time to get the message of error
+    const response = await client.post('/api/v1/workspace')
+      .header('accept', 'application/json')
+      .send({
+        name: 'example name',
+        description: 'description'
+      })
+      .loginVia(user, 'jwt')
+      .end()
+
+    // Check response status
+    response.assertStatus(201)
+    
+    // check response content
+    response.assertJSONSubset({ owner_id: user.id })
+  } finally {
+    await user.delete()
+  }
+})

@@ -12,7 +12,7 @@ class WorkspaceSchema extends Schema {
       table.string('slug_name').notNullable()
       table.string('description', 512).notNullable()
 
-      table.string('owner_id')
+      table.string('owner_uid')
         .references('uid')
         .inTable('users')
         .onDelete('CASCADE')

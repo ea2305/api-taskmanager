@@ -18,6 +18,14 @@ class Workspace extends Model {
   static get incrementing () {
     return false
   }
+  
+  /**
+   * Owner relationship
+   * @method owner
+   */
+  owner () {
+    return this.belongsTo('App/Models/User', 'owner_uid', 'uid')
+  }
 }
 
 module.exports = Workspace

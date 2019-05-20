@@ -32,6 +32,14 @@ class User extends Model {
   tokens () {
     return this.hasMany('App/Models/Token')
   }
+
+  /**
+   * Owner relationship
+   * @method myWorkspaces
+   */
+  myWorkspaces () {
+    return this.hasMany('App/Models/Workspace', 'uid', 'owner_uid')
+  }
 }
 
 module.exports = User

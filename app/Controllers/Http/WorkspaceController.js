@@ -29,14 +29,19 @@ class WorkspaceController {
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
+   * @param {Response} ctx.auth
    */
-  async store ({ request, response }) {
+  async store ({ request, response, auth }) {
     // required parameters
     const parameters = ['name', 'description']
     const workspaceData = request.only(parameters)
 
     // Store entity
     const workspace = await Workspace.create(workspaceData)
+    const user = auth.user
+    // make relationship
+    await workspace.owner().associate(user)
+
     return response.created(workspace)
   }
 
